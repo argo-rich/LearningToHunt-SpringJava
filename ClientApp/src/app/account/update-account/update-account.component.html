@@ -1,0 +1,79 @@
+<div class="card">
+    <h4 class="card-header">Update Account</h4>
+    <div class="card-body">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" formControlName="email" class="form-control" [ngClass]="{ 'is-invalid': submitted && email?.invalid }" />
+                <div *ngIf="submitted && email?.invalid" class="invalid-feedback">
+                    <div *ngIf="email?.hasError('required')">Email is required</div>
+                    <div *ngIf="email?.hasError('email')">Email is not a valid email address</div>
+                </div>
+            </div>            
+            <div class="mb-3">
+                <label class="form-label">First Name</label>
+                <input type="text" formControlName="firstName" class="form-control" [ngClass]="{ 'is-invalid': submitted && firstName?.invalid}" />
+                <div *ngIf="submitted && firstName?.invalid" class="invalid-feedback">
+                    <div *ngIf="firstName?.hasError('required')">First Name is required</div>
+                    <div *ngIf="firstName?.hasError('maxlength')">First Name must be no longer than 100 characters</div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Last Name</label>
+                <input type="text" formControlName="lastName" class="form-control" [ngClass]="{ 'is-invalid': submitted && lastName?.invalid}" />
+                <div *ngIf="submitted && lastName?.invalid" class="invalid-feedback">
+                    <div *ngIf="lastName?.hasError('required')">Last Name is required</div>
+                    <div *ngIf="lastName?.hasError('maxlength')">Last Name must be no longer than 100 characters</div>
+                </div>
+            </div>
+
+            <div class="mb-3" *ngIf="!editPassword">
+                <button type="button" (click)="setEditPassword(true);" class="btn btn-link">Click to update password</button>
+            </div>
+
+            <span *ngIf="editPassword">
+                <div class="mb-3">
+                    <button type="button" (click)="setEditPassword(false);" class="btn btn-link">Hide Password</button>
+                </div>
+                <div class="mb-3">                    
+                    <label class="form-label">Current Password</label>
+                    <input type="password" formControlName="currentPassword" class="form-control" [ngClass]="{ 'is-invalid': submitted && currentPassword?.invalid }" />
+                    <div *ngIf="submitted && currentPassword?.invalid" class="invalid-feedback">
+                        <div *ngIf="currentPassword?.hasError('required')">Current Password is required</div>
+                        <div *ngIf="currentPassword?.hasError('minlength')">Current Password must be at least 6 characters</div>
+                        <div *ngIf="currentPassword?.hasError('maxlength')">Current Password must be no longer than 100 characters</div>
+                        <div *ngIf="currentPassword?.hasError('pattern')">Current Password must contain at least one upper case and lower case letter, one number and one special character.</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" formControlName="password" class="form-control" [ngClass]="{ 'is-invalid': submitted && password?.invalid }" />
+                    <div *ngIf="submitted && password?.invalid" class="invalid-feedback">
+                        <div *ngIf="password?.hasError('required')">Password is required</div>
+                        <div *ngIf="password?.hasError('minlength')">Password must be at least 6 characters</div>
+                        <div *ngIf="password?.hasError('maxlength')">Password must be no longer than 100 characters</div>
+                        <div *ngIf="password?.hasError('pattern')">Password must contain at least one upper case and lower case letter, one number and one special character.</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" formControlName="confirmPassword" class="form-control" [ngClass]="{ 'is-invalid': submitted && (confirmPassword?.invalid || form.errors?.['passwordMismatch']) }" />
+                    <div *ngIf="submitted && confirmPassword?.invalid" class="invalid-feedback">
+                        <div *ngIf="confirmPassword?.hasError('required')">Confirm Password is required</div>
+                    </div>
+                    <div *ngIf="form.errors?.['passwordMismatch']" class="invalid-feedback">
+                        <div>Passwords do not match</div>
+                    </div>
+                </div>
+            </span>
+
+            <div>
+                <button [disabled]="loading" class="btn btn-primary">
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+                    Update
+                </button>
+                <a href="" class="btn btn-link">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

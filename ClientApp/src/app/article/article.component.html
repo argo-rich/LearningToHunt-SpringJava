@@ -1,0 +1,38 @@
+
+<div>
+    <span *ngIf="editMode">
+        <form [formGroup]="form" (ngSubmit)="onSubmit();">
+            <button type="submit" class="btn btn-link">Save</button> |
+            <button type="button" (click)="cancel();" class="btn btn-link">Cancel</button><br>
+            <input class="display-4" formControlName="title" size="25">
+            <div *ngIf="submitted && title!.invalid" class="alert alert-danger">
+                <div *ngIf="title!.hasError('required')">
+                    Title is required.
+                </div>
+                <div *ngIf="title!.hasError('maxlength')">
+                    Title must be no longer than 25 characters.
+                </div>
+            </div>
+            <br>
+            <input class="display-6" formControlName="subtitle" size="35">
+            <div *ngIf="submitted && subtitle!.invalid" class="alert alert-danger">
+                <div *ngIf="subtitle!.hasError('required')">
+                    Subtitle is required.
+                </div>
+                <div *ngIf="subtitle!.hasError('maxlength')">
+                    Subtitle must be no longer than 35 characters.
+                </div>
+            </div>
+            <br>
+            <angular-editor formControlName="content"></angular-editor>
+        </form>
+    </span>
+
+    <span *ngIf="!editMode;">
+        <button (click)="editMode = true" class="btn btn-link" *ngIf="user && user.roles?.includes('Admin')">Edit</button>
+        <h4 class="display-4" >{{article.title}}</h4>
+        <h6 class="display-6">{{article.subtitle}}</h6>
+        <br>
+        <p [innerHTML]="article.content"></p>
+    </span>
+</div>

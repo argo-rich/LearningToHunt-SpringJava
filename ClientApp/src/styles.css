@@ -1,0 +1,28 @@
+/* You can add global styles to this file, and also import other style files */
+@import "bootstrap/dist/css/bootstrap.css";
+
+.sm-nav-logo {
+    font-size: calc(0.750rem);
+    color: rgb(110, 110, 110);
+    text-decoration: none;
+  }
+
+  .p-0 {
+    display: block;
+    content: "";
+    line-height: calc(.3rem + .25rem)
+ }
+
+ .anchor-link {
+  padding: 0%;
+  margin: 0%;
+  height: 10px;
+}
+
+.anchor-links {
+  padding-bottom: 4%;
+}
+
+.display-block {
+  display: block !important;
+}
