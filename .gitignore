@@ -42,7 +42,7 @@
 **/Thumbs.db
 
 **/target/
-**/*.java~
+**/*.*~
 
 **/HELP.md
 !**/.mvn/wrapper/maven-wrapper.jar
