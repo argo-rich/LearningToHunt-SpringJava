@@ -40,7 +40,7 @@ public class ArticleControllerTest {
                 .get("/api/article/get/1")
                 .accept(MediaType.APPLICATION_JSON);
 
-        MvcResult result = mockMvc.perform(request)
+        mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andExpect(content().json("{articleId: 1,title:'Title1',subtitle:'Subtitle1',content:'Content1'}", JsonCompareMode.STRICT)) // verify/assert
                 .andReturn();

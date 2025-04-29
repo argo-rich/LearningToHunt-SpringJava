@@ -24,12 +24,12 @@ public class GlobalExceptionRestController extends ResponseEntityExceptionHandle
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         Response response = new Response(status.toString(), ex.getBindingResult().toString());
-        return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<Object>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({Exception.class})
     public ResponseEntity<Response> exceptionHandler(Exception exception) {
         Response response = new Response("500", exception.getMessage());
-        return new ResponseEntity(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<Response>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

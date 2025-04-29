@@ -19,7 +19,6 @@ public class ArticleController {
     @GetMapping("/get/{id}")
     //@ResponseBody
     public Article getMessagesByStatus(@PathVariable(name = "id")  int id) {
-        Article article = articleService.getArticle(id);
-        return article;
+        return articleService.getArticle(id);
     }
 }
