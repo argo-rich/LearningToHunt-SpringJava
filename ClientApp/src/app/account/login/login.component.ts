@@ -11,9 +11,9 @@ import { User } from '@app/_models/user';
 import { HttpErrorResponse } from '@angular/common/http';
 import { environment } from 'environments/environment';
 
-@Component({ 
+@Component({
   imports: [FormsModule, ReactiveFormsModule, NgIf, NgClass],
-  templateUrl: 'login.component.html' 
+  templateUrl: 'login.component.html'
 })
 export class LoginComponent implements OnInit {
   form!: FormGroup;
@@ -36,13 +36,13 @@ export class LoginComponent implements OnInit {
   }
 
   // convenience getters for easy access to form fields
-  get email() {    
+  get email() {
     return this.form.get('email');
   }
-  get password() {    
+  get password() {
     return this.form.get('password');
   }
-  
+
   // convenience method to determine if the component is working
   get loading() {
     return this.status === HttpRequestStatus.InProgress;
@@ -76,11 +76,11 @@ export class LoginComponent implements OnInit {
                 this.accountService.removeUser();
               },
               error: error => {
-                  // Ff error.status === 401 it just means the user was already logged out on the server 
+                  // Ff error.status === 401 it just means the user was already logged out on the server
                   // side.  Any other error is not good, but we still want to log the user out on the client side.
                   this.accountService.removeUser();
               }
-              
+
           });
             this.alertService.error(`Please confirm your email by clicking the link in the confirmation email received from <br> ${environment.replyEmail}. <br> <br> You may need to check your spam folder.`);
           }
@@ -94,8 +94,8 @@ export class LoginComponent implements OnInit {
 
   inferErrorMessage(errResponse: HttpErrorResponse): string {
     let message = "";
-    
-    if (errResponse.status == 401) {
+
+    if (errResponse.status === 500 && errResponse.error.statusMsg === "Invalid credentials") {
       message = "Email and/or password are invalid."
     } else {
       message = "An error has occurred.  Please try again later."

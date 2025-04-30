@@ -40,7 +40,7 @@ export class AccountService {
   }
 
   logout(): Observable<object> {
-    return this.http.post(`${environment.apiBaseUrl}api/account/logout`, {}, {withCredentials: true});      
+    return this.http.put(`${environment.apiBaseUrl}api/account/logout`, {}, {withCredentials: true});
   }
 
   removeUser() {
@@ -49,7 +49,7 @@ export class AccountService {
     this.userSubject.next(null);
     this.router.navigate(['/account/login']);
   }
-  
+
   update(params: any): Observable<object> {
     return this.http.put(`${environment.apiBaseUrl}api/account/update`, params, {withCredentials: true})
         .pipe(map(x => {
@@ -64,7 +64,7 @@ export class AccountService {
   }
 
   ping(): Observable<object> {
-    return this.http.get(`${environment.apiBaseUrl}api/account/ping`, {withCredentials: true});      
+    return this.http.get(`${environment.apiBaseUrl}api/account/ping`, {withCredentials: true});
   }
 
   forgotPassword(email: string): Observable<ResetToken> {
