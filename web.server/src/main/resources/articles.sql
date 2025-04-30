@@ -13,5 +13,6 @@ UPDATE articles set
                     updated_by = 'rich@argohaus.com';
 
 ALTER TABLE articles
-DROP COLUMN `create_date`,
-    DROP COLUMN `modify_date`;
+DROP COLUMN if exists `create_date`,
+    DROP COLUMN if exists `modify_date`;
+
