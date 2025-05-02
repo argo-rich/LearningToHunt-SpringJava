@@ -1,6 +1,8 @@
 package com.learningtohunt.web.server.rest;
 
 import com.learningtohunt.web.server.model.User;
+import com.learningtohunt.web.server.security.JwtUtil;
+import com.learningtohunt.web.server.service.CustomUserDetailsService;
 import com.learningtohunt.web.server.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,13 +33,22 @@ public class AccountController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping(path = "/login", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST)
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @RequestMapping(path = "/login", method = RequestMethod.POST)
     public User login(@RequestBody Map<String, String> credentials) throws Exception {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(credentials.get("email"), credentials.get("password")));
 
         if (auth.isAuthenticated()) {
-            return userService.findByEmail(credentials.get("email"));
+            User user = userService.findByEmail(credentials.get("email"));
+            final UserDetails userDetails = userDetailsService.loadUserByUsername(credentials.get("email"));
+            user.setToken(jwtUtil.generateToken(userDetails));
+            return user;
         }
 
         throw new Exception("Invalid credentials");
@@ -49,4 +61,7 @@ public class AccountController {
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
     }
+
+    @RequestMapping(path = "/ping", method = {RequestMethod.GET, RequestMethod.OPTIONS})
+    public void ping() {}
 }

@@ -4,15 +4,18 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 
 // added imports
-import { provideHttpClient } from "@angular/common/http";
+import { provideHttpClient, withInterceptors } from "@angular/common/http";
 import { provideNgIdle } from '@ng-idle/core';
 import { provideNgIdleKeepalive } from '@ng-idle/keepalive';
+import { authInterceptor } from './_interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }), 
     provideRouter(routes),
-    provideHttpClient(),
+    provideHttpClient(
+      withInterceptors([authInterceptor])
+    ),
     provideNgIdle(),
     provideNgIdleKeepalive()
   ]
