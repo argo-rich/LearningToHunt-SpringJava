@@ -22,7 +22,7 @@ public class CustomUserDetailsServiceTest {
     private UserRepository userRepository;
 
     @Test
-    public void getUserTest() {
+    public void loadUserByUsernameTest() {
         when(userRepository.findByEmail("test@test.com")).thenReturn(
                 new User(1, "test@test.com", true, "Bob", "Smith", "password", null)
         );

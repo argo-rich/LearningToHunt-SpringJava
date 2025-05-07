@@ -21,6 +21,6 @@ public class UserService {
 
     public boolean updatePassword(String newPwd, int userId) {
         int rowsUpdated = userRepository.updateUserPwd(passwordEncoder.encode(newPwd), userId);
-        return rowsUpdated > 0;
+        return rowsUpdated == 1;
     }
 }
