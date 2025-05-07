@@ -45,6 +45,8 @@ public class ProjectSecurityConfig {
                             // account
                             .requestMatchers("/api/account/login").permitAll()
                             .requestMatchers("/api/account/logout").permitAll()
+                            .requestMatchers("/api/account/forgot-password").permitAll()
+                            .requestMatchers("/api/account/forgot-password-reset").permitAll()
                             .requestMatchers("/api/account/ping").authenticated()
                             .requestMatchers("/").authenticated();
                 })

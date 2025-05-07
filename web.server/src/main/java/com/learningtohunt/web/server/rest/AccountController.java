@@ -1,13 +1,18 @@
 package com.learningtohunt.web.server.rest;
 
-import com.learningtohunt.web.server.model.User;
+import com.learningtohunt.web.server.model.*;
 import com.learningtohunt.web.server.security.JwtUtil;
+import com.learningtohunt.web.server.security.PasswordResetUtil;
 import com.learningtohunt.web.server.service.CustomUserDetailsService;
+import com.learningtohunt.web.server.service.EmailService;
 import com.learningtohunt.web.server.service.UserService;
+import com.learningtohunt.web.server.service.UserTokenService;
+import com.postmarkapp.postmark.client.data.model.message.MessageResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,7 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.Random;
 
 @Slf4j
 @RestController
@@ -34,19 +40,31 @@ public class AccountController {
     private UserService userService;
 
     @Autowired
+    private EmailService emailService;
+
+    @Autowired
     private CustomUserDetailsService userDetailsService;
+
+    @Autowired
+    private UserTokenService userTokenService;
 
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private PasswordResetUtil passwordResetUtil;
+
+    @Autowired
+    private Environment environment;
+
     @RequestMapping(path = "/login", method = RequestMethod.POST)
-    public User login(@RequestBody Map<String, String> credentials) throws Exception {
+    public User login(@RequestBody Credentials creds) throws Exception {
         Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(credentials.get("email"), credentials.get("password")));
+                new UsernamePasswordAuthenticationToken(creds.getEmail(), creds.getPassword()));
 
         if (auth.isAuthenticated()) {
-            User user = userService.findByEmail(credentials.get("email"));
-            final UserDetails userDetails = userDetailsService.loadUserByUsername(credentials.get("email"));
+            User user = userService.findByEmail(creds.getEmail());
+            final UserDetails userDetails = userDetailsService.loadUserByUsername(creds.getEmail());
             user.setToken(jwtUtil.generateToken(userDetails));
             return user;
         }
@@ -62,6 +80,60 @@ public class AccountController {
         }
     }
 
-    @RequestMapping(path = "/ping", method = {RequestMethod.GET, RequestMethod.OPTIONS})
+    @RequestMapping(path = "/ping", method = {RequestMethod.GET})
     public void ping() {}
+
+    @RequestMapping(path = "/forgot-password", method = {RequestMethod.POST})
+    public ResetTokensResponse forgotPassword(@RequestBody Credentials creds) throws Exception {
+        if (creds != null) {
+            User user = userService.findByEmail(creds.getEmail());
+            if (user != null) {
+                int resetCode = passwordResetUtil.generateResetCode();
+                String token = passwordResetUtil.generateToken(environment.getProperty("learningtohunt.resetToken.length", Integer.class));
+                boolean success = userTokenService.saveUserToken(token, user.getUserId());
+                if (success) {
+                    MessageResponse response = emailService.sendEmail(creds.getEmail(), "Password Reset Code", "Your password reset code is: " + resetCode);
+                    log.info("MessageResponse: " + response.getMessage());
+                    return new ResetTokensResponse(resetCode, token);
+                }
+            } else {
+                throw new Exception("User not found");
+            }
+        }
+
+        return null;
+    }
+
+    @RequestMapping(path = "/forgot-password-reset", method = {RequestMethod.PATCH})
+    public void updateForgottenPassword(@RequestBody UpdateForgottenPassword updateForgottenPassword) throws Exception {
+        boolean validData = true;
+        User user = userService.findByEmail(updateForgottenPassword.getEmail());
+
+        if (user != null) {
+            UserToken userToken = userTokenService.findUserToken(updateForgottenPassword.getResetToken(), user.getUserId());
+            int expireMinutes = environment.getProperty("learningtohunt.resetToken.expire.minutes", Integer.class);
+
+            if (userToken != null &&
+                    LocalDateTime.now().isBefore(userToken.getTokenTimestamp().plusMinutes(expireMinutes))) {
+                // update password
+                user.setPwd(updateForgottenPassword.getNewPassword());
+                boolean success = userService.updatePassword(updateForgottenPassword.getNewPassword(), user.getUserId());
+
+                // update user token
+                if (success) {
+                    userTokenService.deleteUserToken(userToken);
+                } else {
+                    throw new Exception("Failed to update password");
+                }
+            } else {
+                validData = false;
+            }
+        } else {
+            validData = false;
+        }
+
+        if (!validData) {
+            throw new Exception("Invalid data");
+        }
+    }
 }

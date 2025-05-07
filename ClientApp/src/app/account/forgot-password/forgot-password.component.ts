@@ -38,7 +38,7 @@ export class ForgotPasswordComponent implements OnInit {
       private route: ActivatedRoute,
       private router: Router
     ) { }
-    
+
   ngOnInit(): void {
     this.form = this.formBuilder.group({
       email: ['', Validators.required]
@@ -46,19 +46,19 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
   // convenience getters for easy access to form fields
-  get email() {    
+  get email() {
     return this.form.get('email');
   }
 
-  get resetCodeInput() {    
+  get resetCodeInput() {
     return this.form.get('resetCodeInput');
   }
-  
-  get password() {    
+
+  get password() {
     return this.form.get('password');
   }
 
-  get confirmPassword() {    
+  get confirmPassword() {
     return this.form.get('confirmPassword');
   }
 
@@ -69,17 +69,17 @@ export class ForgotPasswordComponent implements OnInit {
 
   onSubmit() {
       this.submitted = true;
-  
+
       // reset alerts on submit
       this.alertService.clear();
-  
+
       // stop here if form is invalid
       if (this.form.invalid) {
         return;
       }
-  
+
       this.status = HttpRequestStatus.InProgress;
-      
+
       switch (this.fpSubmitted) {
         case FPSubmitted.None:
           this.requestResetCode();
@@ -135,13 +135,13 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
   updatePassword() {
-    let resetToken = {
+    let resetParams = {
       email: this.emailUser,
-      resetCode: btoa(this.token), // base64 encode the token
+      resetToken: this.token,
       newPassword: this.password!.value
-    };    
+    };
 
-    this.accountService.updateForgottenPassword(resetToken)
+    this.accountService.updateForgottenPassword(resetParams)
       .pipe(first())
       .subscribe({
           next: () => {

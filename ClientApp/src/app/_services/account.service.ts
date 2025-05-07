@@ -72,7 +72,7 @@ export class AccountService {
   }
 
   updateForgottenPassword(params: any): Observable<object> {
-    return this.http.post(`${environment.apiBaseUrl}resetPassword`, params)
+    return this.http.patch(`${environment.apiBaseUrl}api/account/forgot-password-reset`, params)
         .pipe(map(x => {
             // update local storage
             const user = { ...this.userValue, ...params };

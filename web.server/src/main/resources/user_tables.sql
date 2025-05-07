@@ -37,6 +37,20 @@ CREATE TABLE `user_roles` (
     PRIMARY KEY (`user_id`,`role_id`)
 );
 
+DROP TABLE IF EXISTS `user_tokens`;
+CREATE TABLE `user_tokens` (
+     `token` varchar(35) NOT NULL,
+     `token_timestamp` TIMESTAMP NOT NULL,
+     `token_confirmed` boolean NOT NULL DEFAULT false,
+     `user_id` int NOT NULL,
+     `created_at` TIMESTAMP NOT NULL,
+     `created_by` varchar(50) NOT NULL,
+     `updated_at` TIMESTAMP DEFAULT NULL,
+     `updated_by` varchar(50) DEFAULT NULL,
+     FOREIGN KEY (user_id) REFERENCES users(user_id),
+     PRIMARY KEY (`token`, `created_at`)
+);
+
 -- DML
 REPLACE INTO `roles` (`role_id`, `role_name`,`created_at`, `created_by`)
   VALUES (1, 'ADMIN',CURDATE(),'DBA');

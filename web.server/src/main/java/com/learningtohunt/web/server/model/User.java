@@ -40,7 +40,7 @@ public class User extends BaseEntity {
     private String lastName;
 
     @NotBlank(message="Password must not be blank")
-    @Size(min=6, max = 30, message="Password must be between 7 and 30 characters long")
+    @Size(min=7, max = 30, message="Password must be between 7 and 30 characters long")
     //@PasswordValidator
     @JsonIgnore
     private String pwd;
