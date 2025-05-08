@@ -10,6 +10,7 @@ import com.learningtohunt.web.server.service.UserTokenService;
 import com.postmarkapp.postmark.client.data.model.message.MessageResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -20,13 +21,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.Random;
 
 @Slf4j
 @RestController
@@ -78,6 +75,7 @@ public class AccountController {
         if (auth != null){
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
+        request.getSession().invalidate();
     }
 
     @RequestMapping(path = "/ping", method = {RequestMethod.GET})
@@ -89,7 +87,7 @@ public class AccountController {
             User user = userService.findByEmail(creds.getEmail());
             if (user != null) {
                 int resetCode = passwordResetUtil.generateResetCode();
-                String token = passwordResetUtil.generateToken(environment.getProperty("learningtohunt.resetToken.length", Integer.class));
+                String token = passwordResetUtil.generateToken();
                 boolean success = userTokenService.saveUserToken(token, user.getUserId());
                 if (success) {
                     MessageResponse response = emailService.sendEmail(creds.getEmail(), "Password Reset Code", "Your password reset code is: " + resetCode);
@@ -134,6 +132,24 @@ public class AccountController {
 
         if (!validData) {
             throw new Exception("Invalid data");
+        }
+    }
+
+    @RequestMapping(path = "/register", method = {RequestMethod.POST})
+    public void register(@Valid @RequestBody UserRegistration userReg) throws Exception {
+        boolean success = userService.handleUserRegistration(userReg);
+        if (!success) {
+            throw new Exception("Failed to register user");
+        }
+    }
+
+    @RequestMapping(path = "/confirmation/{regToken}", method = {RequestMethod.GET})
+    public void registerConfirmation(@PathVariable(name = "regToken") String regToken, HttpServletResponse response) throws Exception {
+
+        if (userService.handleRegistrationConfirmation(regToken)) {
+            response.sendRedirect(System.getenv("L2H_CLIENT_URL") + "/account/confirmation/success");
+        } else {
+            throw new Exception("Failed to confirm registration");
         }
     }
 }

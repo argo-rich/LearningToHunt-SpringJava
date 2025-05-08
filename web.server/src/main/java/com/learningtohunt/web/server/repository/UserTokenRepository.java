@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserTokenRepository extends JpaRepository<UserToken, UserTokenCompositeKey> {
     UserToken findDistinctByTokenAndUserId(String token, int userId);
+
+    UserToken findDistinctByToken(String token);
 }

@@ -1,7 +1,10 @@
 use learning_to_hunt;
 
 -- DDL
+
+-- dropping these first in order to avoid foreign key errors
 DROP TABLE IF EXISTS `user_roles`;
+DROP TABLE IF EXISTS `user_tokens`;
 
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
@@ -15,7 +18,8 @@ CREATE TABLE `users` (
     `created_by` varchar(50) NOT NULL,
     `updated_at` TIMESTAMP DEFAULT NULL,
     `updated_by` varchar(50) DEFAULT NULL,
-    PRIMARY KEY (`user_id`)
+    PRIMARY KEY (`user_id`),
+    UNIQUE `email` (`email`)
 );
 
 DROP TABLE IF EXISTS `roles`;
@@ -37,7 +41,6 @@ CREATE TABLE `user_roles` (
     PRIMARY KEY (`user_id`,`role_id`)
 );
 
-DROP TABLE IF EXISTS `user_tokens`;
 CREATE TABLE `user_tokens` (
      `token` varchar(35) NOT NULL,
      `token_timestamp` TIMESTAMP NOT NULL,

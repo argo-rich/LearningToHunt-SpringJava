@@ -26,7 +26,7 @@ export class AccountService {
   }
 
   register(user: User): Observable<object> {
-    return this.http.post(`${environment.apiBaseUrl}register`, user);
+    return this.http.post(`${environment.apiBaseUrl}api/account/register`, user);
   }
 
   login(email: string, password: string): Observable<User> {

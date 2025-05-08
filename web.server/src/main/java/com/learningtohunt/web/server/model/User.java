@@ -13,11 +13,6 @@ import org.hibernate.annotations.GenericGenerator;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "users")
-//@FieldsValueMatch(
-//        field = "pwd",
-//        fieldMatch = "confirmPwd",
-//        message = "Passwords do not match!"
-//)
 public class User extends BaseEntity {
 
     @Id
@@ -39,9 +34,6 @@ public class User extends BaseEntity {
     @Size(max=100, message="Last Name must be no more than 100 characters long")
     private String lastName;
 
-    @NotBlank(message="Password must not be blank")
-    @Size(min=7, max = 30, message="Password must be between 7 and 30 characters long")
-    //@PasswordValidator
     @JsonIgnore
     private String pwd;
 

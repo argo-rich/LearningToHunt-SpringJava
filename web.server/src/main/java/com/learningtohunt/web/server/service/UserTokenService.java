@@ -20,10 +20,12 @@ public class UserTokenService {
      * @return True if the token was saved, false otherwise
      */
     public boolean saveUserToken(String token, int userId) {
-        LocalDateTime tokenTimestamp = LocalDateTime.now();
-        UserToken userToken = new UserToken(token, tokenTimestamp, userId, false);
-        UserToken savedUserToken = userTokenRepository.save(userToken);
+        UserToken savedUserToken = userTokenRepository.save(new UserToken(token, LocalDateTime.now(), userId, false));
         return (null != savedUserToken && savedUserToken.getCreatedBy() != null);
+    }
+
+    public UserToken findUserToken(String token) {
+        return userTokenRepository.findDistinctByToken(token);
     }
 
     public UserToken findUserToken(String token, int userId) {
