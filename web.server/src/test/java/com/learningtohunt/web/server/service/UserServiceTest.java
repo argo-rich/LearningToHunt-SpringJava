@@ -4,14 +4,18 @@ import com.learningtohunt.web.server.config.TestConfig;
 import com.learningtohunt.web.server.model.User;
 import com.learningtohunt.web.server.model.UserRegistration;
 import com.learningtohunt.web.server.model.UserToken;
+import com.learningtohunt.web.server.model.UserUpdate;
 import com.learningtohunt.web.server.repository.UserRepository;
 import com.learningtohunt.web.server.security.PasswordResetUtil;
 import com.postmarkapp.postmark.client.data.model.message.MessageResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -22,7 +26,11 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@SpringBootTest
 public class UserServiceTest {
+
+    @Autowired
+    PasswordEncoder realPasswordEncoder;
 
     @InjectMocks
     private UserService  userService;
@@ -41,6 +49,21 @@ public class UserServiceTest {
 
     @Mock
     private EmailService emailService;
+
+    private UserUpdate userUpdate;
+    private User user;
+
+    @BeforeEach
+    public void setUp() {
+        userUpdate = new UserUpdate();
+        userUpdate.setEmail(TestConfig.EMAIL);
+        userUpdate.setCurrentPassword(TestConfig.PASSWORD_GOOD);
+        userUpdate.setPassword(TestConfig.PASSWORD_GOOD);
+        userUpdate.setConfirmPassword(TestConfig.PASSWORD_GOOD);
+        userUpdate.setFirstName(TestConfig.FIRST_NAME);
+        userUpdate.setLastName(TestConfig.LAST_NAME);
+        user = new User(1, TestConfig.EMAIL, true, TestConfig.FIRST_NAME, TestConfig.LAST_NAME, realPasswordEncoder.encode(TestConfig.PASSWORD_GOOD), null);
+    }
 
     @Test
     public void getUserTest() {
@@ -165,5 +188,77 @@ public class UserServiceTest {
 
         // assert
         assertFalse(success);
+    }
+
+    @Test
+    public void handleUserUpdateTest_SuccessAll() throws Exception {
+        when(userRepository.findByUserId(anyInt())).thenReturn(user);
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+
+        boolean success = userService.handleUserUpdate(userUpdate);
+
+        assertTrue(success);
+    }
+
+    @Test
+    public void handleUserUpdateTest_SuccessNoPassword() throws Exception {
+        userUpdate.setCurrentPassword(null);
+        userUpdate.setPassword(null);
+        userUpdate.setConfirmPassword(null);
+
+        when(userRepository.findByUserId(anyInt())).thenReturn(user);
+        when(userRepository.save(any(User.class))).thenReturn(user);
+
+        boolean success = userService.handleUserUpdate(userUpdate);
+
+        assertTrue(success);
+    }
+
+    @Test
+    public void handleUserUpdateTest_InvalidPassword() throws Exception {
+        userUpdate.setCurrentPassword(TestConfig.PASSWORD_BAD);
+        userUpdate.setPassword(TestConfig.PASSWORD_BAD);
+        userUpdate.setConfirmPassword(TestConfig.PASSWORD_BAD);
+
+        when(userRepository.findByUserId(anyInt())).thenReturn(user);
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
+
+        try {
+            boolean success = userService.handleUserUpdate(userUpdate);
+            assertFalse(success);
+        } catch (Exception e) {
+            assertEquals("Invalid current password", e.getMessage());
+        }
+    }
+
+    @Test
+    public void handleUserUpdateTest_ConfirmPasswordEmpty() throws Exception {
+        userUpdate.setConfirmPassword(null);
+
+        when(userRepository.findByUserId(anyInt())).thenReturn(user);
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+
+        try {
+            boolean success = userService.handleUserUpdate(userUpdate);
+            assertFalse(success);
+        } catch (Exception e) {
+            assertEquals("Password and confirm password cannot be empty", e.getMessage());
+        }
+    }
+
+    @Test
+    public void handleUserUpdateTest_PasswordAndConfirmNotMatch() throws Exception {
+        userUpdate.setConfirmPassword(TestConfig.PASSWORD_BAD);
+
+        when(userRepository.findByUserId(anyInt())).thenReturn(user);
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+
+        try {
+            boolean success = userService.handleUserUpdate(userUpdate);
+            assertFalse(success);
+        } catch (Exception e) {
+            assertEquals("Password and confirm password do not match", e.getMessage());
+        }
     }
 }

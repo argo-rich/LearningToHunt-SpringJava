@@ -51,6 +51,7 @@ export class AccountService {
   }
 
   update(params: any): Observable<object> {
+    params.userId = this.userValue?.userId;
     return this.http.put(`${environment.apiBaseUrl}api/account/update`, params, {withCredentials: true})
         .pipe(map(x => {
             // update local storage

@@ -6,6 +6,7 @@ import com.learningtohunt.web.server.config.TestConfig;
 import com.learningtohunt.web.server.model.User;
 import com.learningtohunt.web.server.model.UserRegistration;
 import com.learningtohunt.web.server.model.UserToken;
+import com.learningtohunt.web.server.model.UserUpdate;
 import com.learningtohunt.web.server.security.JwtUtil;
 import com.learningtohunt.web.server.security.PasswordResetUtil;
 import com.learningtohunt.web.server.service.CustomUserDetailsService;
@@ -22,6 +23,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
@@ -485,6 +487,56 @@ public class AccountControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().is5xxServerError())
+                .andReturn();
+    }
+
+    @Test
+    public void userUpdateTest_SuccessAll() throws Exception {
+        auth.setAuthenticated(true);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        when(userService.handleUserUpdate(any(UserUpdate.class))).thenReturn(true);
+
+        RequestBuilder request = MockMvcRequestBuilders
+                .put("/api/account/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\n" +
+                        "  \"userId\": 1,\n" +
+                        "  \"email\": \"" + TestConfig.EMAIL + "\",\n" +
+                        "  \"currentPassword\": \"" + TestConfig.PASSWORD_GOOD + "\",\n" +
+                        "  \"password\": \"" + TestConfig.PASSWORD_GOOD + "\",\n" +
+                        "  \"confirmPassword\": \"" + TestConfig.PASSWORD_GOOD + "\",\n" +
+                        "  \"firstName\": \"" + TestConfig.FIRST_NAME + "\",\n" +
+                        "  \"lastName\": \"" + TestConfig.LAST_NAME + "\"\n" +
+                        "}")
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @Test
+    public void userUpdateTest_SuccessBlankPasswords() throws Exception {
+        auth.setAuthenticated(true);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        when(userService.handleUserUpdate(any(UserUpdate.class))).thenReturn(true);
+
+        RequestBuilder request = MockMvcRequestBuilders
+                .put("/api/account/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\n" +
+                        "  \"userId\": 1,\n" +
+                        "  \"email\": \"" + TestConfig.EMAIL + "\",\n" +
+                        "  \"currentPassword\": \"\",\n" +
+                        "  \"password\": \"\",\n" +
+                        "  \"confirmPassword\": \"\",\n" +
+                        "  \"firstName\": \"" + TestConfig.FIRST_NAME + "\",\n" +
+                        "  \"lastName\": \"" + TestConfig.LAST_NAME + "\"\n" +
+                        "}")
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
                 .andReturn();
     }
 }

@@ -145,11 +145,18 @@ public class AccountController {
 
     @RequestMapping(path = "/confirmation/{regToken}", method = {RequestMethod.GET})
     public void registerConfirmation(@PathVariable(name = "regToken") String regToken, HttpServletResponse response) throws Exception {
-
         if (userService.handleRegistrationConfirmation(regToken)) {
             response.sendRedirect(System.getenv("L2H_CLIENT_URL") + "/account/confirmation/success");
         } else {
             throw new Exception("Failed to confirm registration");
+        }
+    }
+
+    @RequestMapping(path = "/update", method = {RequestMethod.PUT})
+    public void update(@Valid @RequestBody UserUpdate userUpdate) throws Exception {
+        boolean success = userService.handleUserUpdate(userUpdate);
+        if (!success) {
+            throw new Exception("Failed to update user");
         }
     }
 }

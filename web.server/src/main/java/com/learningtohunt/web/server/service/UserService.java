@@ -3,6 +3,7 @@ package com.learningtohunt.web.server.service;
 import com.learningtohunt.web.server.model.User;
 import com.learningtohunt.web.server.model.UserRegistration;
 import com.learningtohunt.web.server.model.UserToken;
+import com.learningtohunt.web.server.model.UserUpdate;
 import com.learningtohunt.web.server.repository.UserRepository;
 import com.learningtohunt.web.server.security.PasswordResetUtil;
 import com.postmarkapp.postmark.client.exception.PostmarkException;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.util.Base64;
@@ -72,6 +74,34 @@ public class UserService {
                 userTokenService.deleteUserToken(userToken);
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    public boolean handleUserUpdate(UserUpdate userUpdate) throws Exception {
+        User user = userRepository.findByUserId(userUpdate.getUserId());
+        if (user != null) {
+            user.setEmail(userUpdate.getEmail());
+            user.setFirstName(userUpdate.getFirstName());
+            user.setLastName(userUpdate.getLastName());
+
+            if (!ObjectUtils.isEmpty(userUpdate.getPassword())) {
+                if (passwordEncoder.matches(userUpdate.getCurrentPassword(), user.getPwd())) {
+                    if (ObjectUtils.isEmpty(userUpdate.getPassword()) || ObjectUtils.isEmpty(userUpdate.getConfirmPassword())) {
+                        throw new Exception("Password and confirm password cannot be empty");
+                    }
+                    if (!userUpdate.getPassword().equals(userUpdate.getConfirmPassword())) {
+                        throw new Exception("Password and confirm password do not match");
+                    }
+                    user.setPwd(passwordEncoder.encode(userUpdate.getPassword()));
+                } else {
+                    throw new Exception("Invalid current password");
+                }
+            }
+
+            userRepository.save(user);
+            return true;
         }
 
         return false;
