@@ -29,7 +29,7 @@
     </span>
 
     <span *ngIf="!editMode;">
-        <button (click)="editMode = true" class="btn btn-link" *ngIf="user && user.roles?.includes('Admin')">Edit</button>
+        <button (click)="editMode = true" class="btn btn-link" *ngIf="user && user.roleNames?.includes('ADMIN')">Edit</button>
         <h4 class="display-4" >{{article.title}}</h4>
         <h6 class="display-6">{{article.subtitle}}</h6>
         <br>

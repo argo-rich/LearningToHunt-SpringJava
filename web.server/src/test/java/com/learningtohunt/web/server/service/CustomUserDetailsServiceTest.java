@@ -9,6 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.HashSet;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -24,7 +26,7 @@ public class CustomUserDetailsServiceTest {
     @Test
     public void loadUserByUsernameTest() {
         when(userRepository.findByEmail("test@test.com")).thenReturn(
-                new User(1, "test@test.com", true, "Bob", "Smith", "password", null)
+                new User(1, "test@test.com", true, "Bob", "Smith", "password", null, new HashSet<>())
         );
 
         UserDetails userDetails = customUserDetailsService.loadUserByUsername("test@test.com");

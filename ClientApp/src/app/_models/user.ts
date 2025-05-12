@@ -1,4 +1,6 @@
-﻿export class User {
+﻿import {Role} from '@app/_models/Role';
+
+export class User {
     userId?: number;
     email?: string;
     password?: string;
@@ -6,6 +8,7 @@
     firstName?: string;
     lastName?: string;
     emailConfirmed?: boolean;
-    roles?: string[]
+    roles?: Role[];
+    roleNames?: string[];
     token?: string;
 }

@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -62,13 +63,13 @@ public class UserServiceTest {
         userUpdate.setConfirmPassword(TestConfig.PASSWORD_GOOD);
         userUpdate.setFirstName(TestConfig.FIRST_NAME);
         userUpdate.setLastName(TestConfig.LAST_NAME);
-        user = new User(1, TestConfig.EMAIL, true, TestConfig.FIRST_NAME, TestConfig.LAST_NAME, realPasswordEncoder.encode(TestConfig.PASSWORD_GOOD), null);
+        user = new User(1, TestConfig.EMAIL, true, TestConfig.FIRST_NAME, TestConfig.LAST_NAME, realPasswordEncoder.encode(TestConfig.PASSWORD_GOOD), null, new HashSet<>());
     }
 
     @Test
     public void getUserTest() {
         when(userRepository.findByEmail(TestConfig.EMAIL)).thenReturn(
-                new User(1, TestConfig.EMAIL, true, "Bob", "Smith", TestConfig.PASSWORD_GOOD, null)
+                new User(1, TestConfig.EMAIL, true, "Bob", "Smith", TestConfig.PASSWORD_GOOD, null, new HashSet<>())
         );
 
         User user = userService.findByEmail("test@test.com");
@@ -94,7 +95,7 @@ public class UserServiceTest {
 
         when(userRepository.save(any(User.class))).thenReturn(
             new User(1, userReg.getEmail(), true, userReg.getFirstName(), userReg.getLastName(), userReg.getPassword(),
-                    null));
+                    null, new HashSet<>()));
         when(passwordEncoder.encode(anyString())).thenReturn(TestConfig.PASSWORD_GOOD);
         when(passwordResetUtil.generateToken()).thenReturn("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
         when(userTokenService.saveUserToken(anyString(), anyInt())).thenReturn(true);
@@ -124,7 +125,7 @@ public class UserServiceTest {
 
         when(userRepository.save(any(User.class))).thenReturn(
                 new User(0, userReg.getEmail(), true, userReg.getFirstName(), userReg.getLastName(),
-                        userReg.getPassword(), null)
+                        userReg.getPassword(), null, new HashSet<>())
         );
 
         boolean success = userService.handleUserRegistration(userReg);
@@ -139,7 +140,7 @@ public class UserServiceTest {
 
         when(userRepository.save(any(User.class))).thenReturn(
                 new User(1, userReg.getEmail(), true, userReg.getFirstName(), userReg.getLastName(), userReg.getPassword(),
-                        null));
+                        null, new HashSet<>()));
         when(passwordEncoder.encode(anyString())).thenReturn(TestConfig.PASSWORD_GOOD);
         when(passwordResetUtil.generateToken()).thenReturn("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
         when(userTokenService.saveUserToken(anyString(), anyInt())).thenReturn(false);
@@ -152,7 +153,7 @@ public class UserServiceTest {
     @Test
     public void handleRegistrationConfirmation_Success() throws Exception {
         UserToken userToken = new UserToken(TestConfig.CONFIRMATION_CODE, LocalDateTime.now(), 1, false);
-        User user = new User(userToken.getUserId(), TestConfig.EMAIL, false, TestConfig.FIRST_NAME, TestConfig.LAST_NAME, TestConfig.PASSWORD_GOOD, null);
+        User user = new User(userToken.getUserId(), TestConfig.EMAIL, false, TestConfig.FIRST_NAME, TestConfig.LAST_NAME, TestConfig.PASSWORD_GOOD, null, new HashSet<>());
         when(userTokenService.findUserToken(TestConfig.CONFIRMATION_CODE)).thenReturn(userToken);
         when(userRepository.findByUserId(1)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(user);

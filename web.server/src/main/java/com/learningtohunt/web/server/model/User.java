@@ -9,6 +9,10 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -39,5 +43,13 @@ public class User extends BaseEntity {
 
     @Transient
     private String token;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
+
+    public List<String> getRoleNames() { return roles.stream().map(Role::getRoleName).toList(); }
 
 }
