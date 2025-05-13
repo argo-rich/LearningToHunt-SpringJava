@@ -38,10 +38,26 @@ public class ProjectSecurityConfig {
         http.cors(Customizer.withDefaults())
                 .authorizeHttpRequests((requests) -> {
                     requests
+                            // Home page & Angular files
+                            .requestMatchers("/").permitAll()
+                            .requestMatchers("/index.html").permitAll()
+                            .requestMatchers("/hunting-guide", "/article/**", "/account/**", "/privacy").permitAll() // replicate in SpaController.forward()
+                            .requestMatchers("/favicon.ico").permitAll()
+                            .requestMatchers("/styles*.css").permitAll()
+                            .requestMatchers("/chunk-*.js").permitAll()
+                            .requestMatchers("/polyfills*.js", "/scripts*.js", "/main*.js").permitAll()
+                            .requestMatchers("/assets/**").permitAll()
+                            .requestMatchers("/esm2020/**").permitAll()
+                            .requestMatchers("/fesm2015/**").permitAll()
+                            .requestMatchers("/fesm2020/**").permitAll()
+                            .requestMatchers("/lib/**").permitAll()
+                            .requestMatchers("/themes/**").permitAll()
+                            .requestMatchers("/kolkov-angular-editor.d.ts", "/package.json", "/public-api.d.ts").permitAll() // kolkov angular editor
+
                             // articles
                             .requestMatchers("/api/article/get/**").permitAll()
 
-                            // account
+                            // user account
                             .requestMatchers("/api/account/login").permitAll()
                             .requestMatchers("/api/account/logout").permitAll()
                             .requestMatchers("/api/account/forgot-password").permitAll()
@@ -49,8 +65,7 @@ public class ProjectSecurityConfig {
                             .requestMatchers("/api/account/register").permitAll()
                             .requestMatchers("/api/account/confirmation/**").permitAll()
                             .requestMatchers("/api/account/ping").authenticated()
-                            .requestMatchers("/api/account/update").authenticated()
-                            .requestMatchers("/").authenticated();
+                            .requestMatchers("/api/account/update").authenticated();
                 })
                 .sessionManagement(sessionCreationPolicy ->
                         sessionCreationPolicy.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

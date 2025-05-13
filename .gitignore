@@ -11,6 +11,9 @@
 **/npm-debug.log
 **/yarn-error.log
 
+# Ignoring static folder since this is where the Angular output goes
+**/static
+
 # IDEs and editors
 **/.idea/
 **/.project

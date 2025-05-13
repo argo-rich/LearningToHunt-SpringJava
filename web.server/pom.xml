@@ -12,6 +12,7 @@
 	<artifactId>web.server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>web.server</name>
+	<packaging>jar</packaging>
 	<description>Learning to Hunt web application</description>
 	<url/>
 	<licenses>
@@ -132,6 +133,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>lth-aws-deployment</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
