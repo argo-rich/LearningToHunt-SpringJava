@@ -4,7 +4,7 @@
                 <div>
                     <a class="navbar-brand" routerLink="/">
                         Learning <small><u><i>to</i></u></small> Hunt
-                    </a>                    
+                    </a>
                     <p class="p-0">
                         <a class="sm-nav-logo" routerLink="/"><small class="sm-nav-logo">The Hunting 101 bootstrap</small></a>
                     </p>
@@ -29,7 +29,7 @@
                             <a class="nav-link text-dark" routerLink="privacy">Privacy</a>
                         </li>
                     </ul>
-                    
+
                     <ul class="navbar-nav" *ngIf="user">
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -66,11 +66,11 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; {{currDate | date:'yyyy'}} - Learning to Hunt - <a routerLink="privacy">Privacy</a>
+            &copy; {{currDate | date:'yyyy'}} - Learning to Hunt v4 - <a routerLink="privacy">Privacy</a>
         </div>
     </footer>
 
-    
+
     <div bsModal #childModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-child-name">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
@@ -92,4 +92,3 @@
             </div>
         </div>
     </div>
-    
